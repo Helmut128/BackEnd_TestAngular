@@ -9,10 +9,10 @@ app.use(cors());
 
 // Configuración de la conexión a la base de datos
 const dbConfig = {
-  server: "localhost", // Cambia esto con la dirección de tu servidor SQL Server
-  user: "sa", // Cambia esto con tu usuario de SQL Server
-  password: "123456789", // Cambia esto con tu contraseña
-  database: "db_erp2", // Cambia esto con el nombre de tu base de datos
+  server: "localhost",
+  user: "sa",
+  password: "123456789",
+  database: "db_erp2",
   options: {
     encrypt: false, // Deshabilita el cifrado
     trustServerCertificate: true, // Acepta cualquier certificado del servidor (INSEGURO)
@@ -67,7 +67,7 @@ app.get("/areas", async (req, res) => {
     const pool = await mssql.connect(dbConfig);
     const result = await pool
       .request()
-      .query("SELECT  [name], isActiveLog FROM [security].[area]");
+      .query("SELECT  * FROM [security].[area]");
     res.json(result.recordset);
   } catch (error) {
     console.error("Error:", error);
@@ -204,6 +204,50 @@ app.post("/menu", async (req, res) => {
 
     const newMenuId = result.recordset[0].newMenuId;
     res.json({ success: true, newMenuId });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).send("Error de servidor");
+  }
+});
+
+//ACTUALIZAR DATOS
+
+app.put("/users/:id", async (req, res) => {
+  const userId = req.params.id;
+  const { name } = req.body;
+
+  try {
+    const pool = await mssql.connect(dbConfig);
+    const result = await pool
+      .request()
+      .input("id", mssql.Int, userId)
+      .input("name", mssql.NVarChar, name)
+      .query("UPDATE [security].[user] SET [name] = @name WHERE [id] = @id");
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).send("Error de servidor");
+  }
+});
+
+// Agrega una nueva ruta para actualizar un registro por ID
+app.put("/areas/:id", async (req, res) => {
+  const { id } = req.params;
+  const updatedData = req.body;
+  console.log("Received PUT request for ID:", id);
+
+  try {
+    const pool = await mssql.connect(dbConfig);
+    const result = await pool
+      .request()
+      .input("id", mssql.Int, id)
+      .input("name", mssql.NVarChar, updatedData.name)
+      .query(
+        "SELECT * FROM  [security].[area] SET [name] = @name WHERE [id] = @id"
+      );
+
+    res.json({ success: true });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).send("Error de servidor");
