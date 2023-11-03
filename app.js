@@ -210,47 +210,43 @@ app.post("/menu", async (req, res) => {
   }
 });
 
-//ACTUALIZAR DATOS
-
-app.put("/users/:id", async (req, res) => {
-  const userId = req.params.id;
-  const { name } = req.body;
+// Agrega una nueva ruta para actualizar un registro por ID
+app.post("/updateData", async (req, res) => {
+  const { idArea } = req.body; //aqui en vez de req.body tenias req.parameter, el body se refiere a todo los datos que le pasaras como objeto o como json y no como url
+  const updatedData = req.body;
+  console.log("Received PUT request for ID:", idArea);
 
   try {
     const pool = await mssql.connect(dbConfig);
     const result = await pool
       .request()
-      .input("id", mssql.Int, userId)
-      .input("name", mssql.NVarChar, name)
-      .query("UPDATE [security].[user] SET [name] = @name WHERE [id] = @id");
-
+      .input("idArea", mssql.Int, idArea)
+      .input("name", mssql.NVarChar, updatedData.name)
+      .query(
+        "UPDATE A SET A.[name] = @name FROM security.area A WHERE idArea = @idArea"
+      );
     res.json({ success: true });
   } catch (error) {
     console.error("Error:", error);
-    res.status(500).send("Error de servidor");
+    // res.status(500).send("Error de servidor", error);
   }
 });
 
-// Agrega una nueva ruta para actualizar un registro por ID
-app.put("/areas/:id", async (req, res) => {
-  const { id } = req.params;
-  const updatedData = req.body;
-  console.log("Received PUT request for ID:", id);
+app.delete("/deleteData/:idArea", async (req, res) => {
+  const { idArea } = req.params; //aqui en vez de req.body tenias req.parameter, el body se refiere a todo los datos que le pasaras como objeto o como json y no como url
+  console.log("Received PUT request for ID:", idArea);
 
   try {
     const pool = await mssql.connect(dbConfig);
     const result = await pool
       .request()
-      .input("id", mssql.Int, id)
-      .input("name", mssql.NVarChar, updatedData.name)
-      .query(
-        "SELECT * FROM  [security].[area] SET [name] = @name WHERE [id] = @id"
-      );
+      .input("idArea", mssql.Int, idArea)
 
+      .query("DELETE FROM security.area WHERE idArea = @idArea");
     res.json({ success: true });
   } catch (error) {
     console.error("Error:", error);
-    res.status(500).send("Error de servidor");
+    // res.status(500).send("Error de servidor", error);
   }
 });
 
