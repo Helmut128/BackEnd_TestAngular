@@ -411,7 +411,6 @@ app.post("/addArea", async (req, res) => {
     const result = await pool
       .request()
       .input("name", mssql.NVarChar, name)
-      .input("isActiveLog", mssql.Bit, isActiveLog)
       .query(
         "INSERT INTO [security].[area] ([name]) VALUES (@name); SELECT SCOPE_IDENTITY() AS newAreaId;"
       );
@@ -424,7 +423,71 @@ app.post("/addArea", async (req, res) => {
   }
 });
 
-// ...
+// Agregar un nuevo lenguage
+app.post("/addLanguague", async (req, res) => {
+  const { name, code } = req.body;
+
+  try {
+    const pool = await mssql.connect(dbConfig);
+    const result = await pool
+      .request()
+      .input("name", mssql.NVarChar, name)
+      .input("code", mssql.NVarChar, code)
+      .query(
+        "INSERT INTO [security].[language] ([name], [code]) VALUES (@name, @code); SELECT SCOPE_IDENTITY() AS newAreaId;"
+      );
+
+    const newAreaId = result.recordset[0].newAreaId;
+    res.json({ success: true, newAreaId });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).send("Error de servidor");
+  }
+});
+
+//Agregar menus
+app.post("/addMenu", async (req, res) => {
+  const { name, url } = req.body;
+
+  try {
+    const pool = await mssql.connect(dbConfig);
+    const result = await pool
+      .request()
+      .input("name", mssql.NVarChar, name)
+      .input("url", mssql.NVarChar, url)
+      .query(
+        "INSERT INTO [security].[menu] ([name], [url]) VALUES (@name, @url); SELECT SCOPE_IDENTITY() AS newMenuId;"
+      );
+
+    const newMenuId = result.recordset[0].newMenuId;
+    res.json({ success: true, newMenuId });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).send("Error de servidor");
+  }
+});
+
+// agregar nuevo usuario
+app.post("/addUsers", async (req, res) => {
+  const { name, userName } = req.body;
+
+  try {
+    const pool = await mssql.connect(dbConfig);
+    const result = await pool
+      .request()
+      .input("name", mssql.NVarChar, name)
+      .input("userName", mssql.NVarChar, userName)
+      .query(
+        "INSERT INTO [security].[user] ([name], [userName]) VALUES (@name, @userName); SELECT SCOPE_IDENTITY() AS newUserId;"
+      );
+
+    const newUserId = result.recordset[0].newUserId;
+    res.json({ success: true, newUserId });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).send("Error de servidor");
+  }
+});
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
