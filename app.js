@@ -2,22 +2,13 @@ const express = require("express");
 const mssql = require("mssql");
 const bodyParser = require("body-parser"); // Importa el body-parser
 const cors = require("cors");
+const { obtenerAreas } = require("./controllers/area.controller");
 
 const app = express();
 app.use(bodyParser.json()); // Parsear solicitudes JSON
 app.use(cors());
 
-// Configuración de la conexión a la base de datos
-const dbConfig = {
-  server: "localhost",
-  user: "sa",
-  password: "123456789",
-  database: "db_erp2",
-  options: {
-    encrypt: false, // Deshabilita el cifrado
-    trustServerCertificate: true, // Acepta cualquier certificado del servidor (INSEGURO)
-  },
-};
+app.use("/areas", obtenerAreas);
 
 // Endpoint para obtener los usuarios "LANGUAGUES"
 app.get("/languages", async (req, res) => {
