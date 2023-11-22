@@ -1,14 +1,16 @@
-const express = require("express");
-const mssql = require("mssql");
-const bodyParser = require("body-parser"); // Importa el body-parser
-const cors = require("cors");
-const { obtenerAreas } = require("./controllers/area.controller");
+import express from "express";
+import mssql from "mssql";
+import cors from "cors";
+import { dbConfig } from "./conextion/dbConfig.js";
+
+import routesArea from "./routes/area.routes.js";
 
 const app = express();
-app.use(bodyParser.json()); // Parsear solicitudes JSON
+app.use(express.json()); // Parsear solicitudes JSON
 app.use(cors());
 
-app.use("/areas", obtenerAreas);
+//Rutas
+app.use("/", routesArea);
 
 // Endpoint para obtener los usuarios "LANGUAGUES"
 app.get("/languages", async (req, res) => {
