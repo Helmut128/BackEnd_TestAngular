@@ -4,7 +4,7 @@ import { obtenerAreas } from "../controllers/area.controller.js";
 const routes = Router();
 
 // Definir la ruta para obtener áreas
-// Definir la ruta para obtener áreas
+
 routes.get("/areas", obtenerAreas);
 
 // Exportar el router

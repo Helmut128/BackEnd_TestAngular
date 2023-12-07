@@ -4,7 +4,9 @@ import cors from "cors";
 import { dbConfig } from "./conextion/dbConfig.js";
 
 import routesArea from "./routes/area.routes.js";
-
+import routesLanguage from "./routes/language.routes.js";
+import routesMenu from "./routes/menu.routes.js";
+import routerUsers from "./routes/user.routes.js";
 const app = express();
 app.use(express.json()); // Parsear solicitudes JSON
 app.use(cors());
@@ -13,54 +15,21 @@ app.use(cors());
 app.use("/", routesArea);
 
 // Endpoint para obtener los usuarios "LANGUAGUES"
-app.get("/languages", async (req, res) => {
-  try {
-    const pool = await mssql.connect(dbConfig);
-    const result = await pool
-      .request()
-      .query("SELECT [name], [code], [idLanguage] FROM security.[language]");
-    res.json(result.recordset);
-  } catch (error) {
-    console.error("Error:", error);
-    res.status(500).send("Error de servidor");
-  }
-});
+app.use("/", routesLanguage);
 
 // Endpoint para obtener los usuarios "MENU"
-app.get("/menu", async (req, res) => {
-  try {
-    const pool = await mssql.connect(dbConfig);
-    const result = await pool
-      .request()
-      .query("SELECT  [name], [url], [idMenu] FROM [security].[menu]");
-    res.json(result.recordset);
-  } catch (error) {
-    console.error("Error:", error);
-    res.status(500).send("Error de servidor");
-  }
-});
+app.use("/", routesMenu);
+
+// Endpoint para obtener los usuarios "USUARIOS"
+app.use("/", routerUsers);
 
 // Endpoint para obtener los usuarios "PERMISSIONS"
-app.get("/permissions", async (req, res) => {
+app.get("/permission", async (req, res) => {
   try {
     const pool = await mssql.connect(dbConfig);
     const result = await pool
       .request()
-      .query("SELECT [name], isActiveLog FROM [security].[permission]");
-    res.json(result.recordset);
-  } catch (error) {
-    console.error("Error:", error);
-    res.status(500).send("Error de servidor");
-  }
-});
-
-// Endpoint para obtener los usuarios "AREAS"
-app.get("/areas", async (req, res) => {
-  try {
-    const pool = await mssql.connect(dbConfig);
-    const result = await pool
-      .request()
-      .query("SELECT  * FROM [security].[area]");
+      .query("SELECT [name], [idPermission] FROM [security].[permission]");
     res.json(result.recordset);
   } catch (error) {
     console.error("Error:", error);
@@ -75,22 +44,6 @@ app.get("/categories", async (req, res) => {
     const result = await pool
       .request()
       .query("SELECT [name] FROM [project].[category]");
-    res.json(result.recordset);
-  } catch (error) {
-    console.error("Error:", error);
-    res.status(500).send("Error de servidor");
-  }
-});
-
-// Endpoint para obtener los usuarios "USUARIOS"
-app.get("/users", async (req, res) => {
-  try {
-    const pool = await mssql.connect(dbConfig);
-    const result = await pool
-      .request()
-      .query(
-        "SELECT [name], [userName], [alias], [idUser] FROM [security].[user]"
-      );
     res.json(result.recordset);
   } catch (error) {
     console.error("Error:", error);
@@ -362,6 +315,24 @@ app.delete("/deleteDataUser/:idUser", async (req, res) => {
       .input("idUser", mssql.Int, idUser)
 
       .query("DELETE FROM security.[user] WHERE idUser = @idUser");
+    res.json({ success: true });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).send("Error de servidor", error);
+  }
+});
+
+//Eliminar DATA de la base de datos "Permission"
+app.delete("/deleteDataPermission/:idPermission", async (req, res) => {
+  const { idPermission } = req.params;
+  console.log("Received PUT request for ID:", idPermission);
+
+  try {
+    const pool = await mssql.connect(dbConfig);
+    const result = await pool.request();
+    idPermission.query(
+      "DELETE FROM security.[permission] WHERE idPermission = @idPermission"
+    );
     res.json({ success: true });
   } catch (error) {
     console.error("Error:", error);

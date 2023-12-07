@@ -2,7 +2,7 @@
 export const dbConfig = {
   server: "localhost",
   user: "sa",
-  password: "*********",
+  password: "********",
   database: "db_erp2",
   options: {
     encrypt: false, // Deshabilita el cifrado
